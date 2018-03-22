@@ -1,26 +1,32 @@
 from PIL import Image, ImageColor
-
-width = 1920
-height = 1080
-destinationImage = Image.new("RGB", (width, height))
-
+maxIterations = 60
+width = 400
+height = 400
+destinationImage = Image.new("RGBA", (width, height))
+donepercent = 0
 for px in range(0, width):
     for py in range(0, height):
 
-        x0 = (((px / width ) * 3.5) - 2.5)
+        x0 = (((px / width ) * 2.5) - 1.5)
         y0 = (((py / height) * 2.0) - 1.0)
         x = 0.0
         y = 0.0
         iteration = 0
 
-        while x*x + y*y < 4 and iteration < 1024:
+        while x*x + y*y < 4 and iteration < maxIterations:
             xtemp = x * x - y * y + x0
             y = 2 * x * y + y0
             x = xtemp
             iteration = iteration + 1
         
         if iteration > 0:
-            color = ((iteration / 1024) * 255)
+            color = int((iteration / maxIterations) * 255)
+            color = 0 | int(color / 2) << 8 | color << 16 | color << 24
             destinationImage.putpixel((px, py), int(color))
+
+    newdonepercent = int((px / width) * 100)
+    if(newdonepercent != donepercent):
+        print ("{}% ferdig".format(newdonepercent))
+        donepercent = newdonepercent
 
 destinationImage.save("output.png")
